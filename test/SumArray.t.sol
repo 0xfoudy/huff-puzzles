@@ -18,7 +18,7 @@ contract SumArrayTest is Test, NonMatchingSelectorHelper {
     }
 
     function testSumArray() external {
-        uint256[] memory arr = new uint256[](10);
+       uint256[] memory arr = new uint256[](10);
         arr[0] = 2;
         arr[1] = 4;
         arr[2] = 262;
@@ -28,7 +28,7 @@ contract SumArrayTest is Test, NonMatchingSelectorHelper {
         arr[6] = 0;
         arr[7] = 17;
         arr[8] = 67251781;
-        arr[9] = 27;
+        arr[9] = 27; 
 
         uint256 x = sumArray.sumArray(arr);
         assertEq(x, 67252106, "expected sum of arr to be 67252106");

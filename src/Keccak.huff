@@ -9,5 +9,28 @@
 
 
  #define macro MAIN() = takes(0) returns(0) {
+    0x00 calldataload
+
+    0x00 mstore
+    0x20 calldataload
+
+    dup1
+    0x00 eq     //if calldata empty
+    done jumpi
+
+    0x20 mstore
+    0x40 calldataload
+    0x40 mstore
+
+    
+    0x60 0x00 sha3
+    0x80 mstore
+    0x20 0x80 return
+
+    done:
+    0x20 mstore
+    0x40 0x00 sha3
+    0x00 mstore
+    0x20 0x00 return
     
  }

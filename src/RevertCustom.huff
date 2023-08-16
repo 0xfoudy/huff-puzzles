@@ -14,5 +14,7 @@
 #define error OnlyHuff()
 
 #define macro MAIN() = takes(0) returns(0) {
-    
+    __ERROR(OnlyHuff)   // __ERROR builtin to push the left-padded 4 byte error selector to the stack
+    0x00 mstore         // [panic_code]
+    0x20 0x00 revert // 0x00 offset 0x20 length
 }

@@ -13,5 +13,48 @@
 
 
 #define macro MAIN() = takes(0) returns(0) {
+    0x00 calldataload
+    0xE0
+    shr
 
+    __FUNC_SIG(multiply) eq 
+    multiply jumpi
+
+    invalid
+
+    multiply:
+        MULTI()
+}
+
+#define macro MULTI() = takes(0) returns(0) {
+    0x04 calldataload // [arg1]
+    dup1              // [arg1, arg1]
+    0x24 calldataload // [arg1, arg1, arg2]
+    dup1              // [arg1, arg1, arg2, arg2]
+    swap2             // [arg1, arg2, arg2, arg1]
+    mul               // [arg1, arg2, arg2*arg1]
+    dup1              // [arg1, arg2, arg2*arg1, arg2*arg1]
+    swap2             // [arg1, arg2*arg1, arg2*arg1, arg2]
+    gt                // check if arg2 > arg2*arg1, only ok to be true if our answer is 0
+    bad jumpi         // [arg1, arg2*arg1, true or false]
+
+    0x00 mstore
+    0x20 0x00 return
+
+// our result is smaller than one of the multiplied values
+
+    bad:              // [arg1, arg2*arg1]  no need to op because true is poped from jumpi
+    dup1              // [arg1, arg2*arg1, arg2*arg1]
+    0x00 eq           // [arg1, arg2*arg1, arg2*arg1, 0] check if it's 0
+    good jumpi
+    invalid
+    good:
+        dup1
+        gt            // check if arg1 > arg2*arg1, only ok to be true if our answer is 0
+        baad jumpi
+        0x00 mstore
+        0x20 0x00 return
+        
+        baad:
+        invalid
 }

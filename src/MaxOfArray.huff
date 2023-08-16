@@ -7,8 +7,58 @@
  *  NOTICE: The contract should revert when an unrecognized function is called
  */
 
-#define function maxOfArray(uint256[]) payable returns(uint256)
+#define function maxOfArray(uint128[]) payable returns(uint256)
 
 #define macro MAIN() = takes(0) returns(0) {
-   
+   0x00 calldataload
+   0xE0
+   shr
+
+   __FUNC_SIG(maxOfArray) eq
+   maxOfArray jumpi
+
+   invalid
+
+   maxOfArray:
+        MAX_OF_ARRAY()
+}
+
+#define macro MAX_OF_ARRAY() = takes(0) returns(0) {
+    0x04 calldataload                          // [len]
+
+    0x24 calldataload 0x00 eq                  // handle empty array
+    emptyarray jumpi
+
+    emptyarray:
+        invalid
+
+    0x00                                       // [max, len]
+    0x00                                       // [i, max, len]
+
+    start jump
+    iterate:
+        eq end jumpi                           // compare i+1 to len
+    start:
+    dup1 0x20 mul 0x44 add calldataload        // [a(i), i, max, len]
+    dup3 dup2                                  // [a(i), max, a(i), i, max, len]
+    gt                                         
+    newMax jumpi
+    pop                                        // [i, max, len]
+    continue jump
+
+    newMax:                                     // [a(i), i, max, len]
+        swap2                                   // [max, i, a(i), len]
+        pop                                     // [i, a(i), len]     a(i) is the new max
+        continue jump
+
+    continue:
+        0x01 add                                // [i+1, a(i) or max, len]
+        dup3 dup2                               // [i+1, len, i+1, a(i) or max, len]
+        iterate jump
+
+    end:
+        pop
+        0x00 mstore
+        0x20 0x00 return
+
 }
