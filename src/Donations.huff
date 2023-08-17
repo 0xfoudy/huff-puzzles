@@ -7,6 +7,42 @@
 
 #define function donated(address) payable returns(uint256)
 
+#define constant BALANCES_SLOT = FREE_STORAGE_POINTER()
+
+
+// we need a mapping of addresses with uints that will get incremented everytime there's a payment (keccak256(abi.encode(address, slot)))
+
 #define macro MAIN() = takes(0) returns(0) {
-    
+    0x00 calldataload
+    0xE0
+    shr
+
+    __FUNC_SIG(donated) eq
+    donated jumpi
+
+    DONATED()
+    callvalue              // load callvalue into stack
+    add
+    [BALANCES_SLOT]
+    0x00 mstore                 // store the slot in memory
+    caller
+    0x20 mstore                 // store caller in memory
+    0x40 0x00 sha3              // keccak256 address,slot
+
+    sstore
+
+    donated:
+        DONATED()
+        0x00 mstore
+        0x20 0x00 return
+}
+
+#define macro DONATED() = takes(0) returns(0) {
+    [BALANCES_SLOT]
+    0x00 mstore                 // store the slot in memory
+    caller
+    0x20 mstore                 // store caller in memory
+    0x40 0x00 sha3              // keccak256 address,slot
+
+    sload
 }
