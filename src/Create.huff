@@ -13,5 +13,35 @@
 
 
  #define macro MAIN() = takes(0) returns(0) {
-    
+    0x00 calldataload
+    0xE0
+    shr
+
+    __FUNC_SIG(makeContract) eq
+    makeContract jumpi
+
+    invalid
+
+    makeContract:
+        MAKE_CONTRACT()
  }
+
+ #define macro MAKE_CONTRACT() = takes(0) returns(0) {
+    0x6b0caffe60005260036000f3600052600c601df3    
+    0x00 mstore
+    0x1d        // Push length of contract initialization code (12 bytes) onto the stack
+    0x00        // Push contract initialization code offset (0) onto the stack
+    0x00         
+    create
+
+    0x00 mstore
+    0x20 0x00 return
+ }
+
+
+/*
+0x6b0caffe60005260036000f3600052600b6020f3
+PUSH12 0caffe60005260036000f3 (0caffe, push0, mstore, push1 03, push0, return)
+600052600c6020f3 (push0, mstore, push 12 (size of what is pushed), push 1d (20 bytes), return)
+
+*/
